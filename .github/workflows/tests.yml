@@ -1,0 +1,33 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  SYMFONY_PHPUNIT_REMOVE: "symfony/yaml"
+  SYMFONY_DEPRECATIONS_HELPER: "max[direct]=0"
+  PHP_VERSION: 7.4
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          extensions: xml, pdo_sqlite
+          tools: "composer:v2"
+
+      - name: Install dependencies
+        run: |
+          composer update --prefer-dist --no-progress
+
+      - name: Run static analysis
+        run: ./vendor/bin/psalm
